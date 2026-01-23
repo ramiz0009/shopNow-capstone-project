@@ -17,8 +17,12 @@ pipeline {
         stage('Terraform Init') {
             steps {
                 dir('shopnow-infra') {
-                    withAWS(credentials: 'aws-prod', region: "${AWS_DEFAULT_REGION}") {
+                    withCredentials([
+                        [$class: 'AmazonWebServicesCredentialsBinding',
+                         credentialsId: 'aws-prod']
+                    ]) {
                         sh '''
+                          export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
                           terraform init -upgrade
                         '''
                     }
@@ -39,8 +43,12 @@ pipeline {
         stage('Terraform Plan') {
             steps {
                 dir('shopnow-infra') {
-                    withAWS(credentials: 'aws-prod', region: "${AWS_DEFAULT_REGION}") {
+                    withCredentials([
+                        [$class: 'AmazonWebServicesCredentialsBinding',
+                         credentialsId: 'aws-prod']
+                    ]) {
                         sh '''
+                          export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
                           terraform plan -var-file=${TFVARS_FILE} -out=tfplan
                         '''
                     }
@@ -55,9 +63,13 @@ pipeline {
             steps {
                 input message: "Approve Terraform Apply to PROD?"
                 dir('shopnow-infra') {
-                    withAWS(credentials: 'aws-prod', region: "${AWS_DEFAULT_REGION}") {
+                    withCredentials([
+                        [$class: 'AmazonWebServicesCredentialsBinding',
+                         credentialsId: 'aws-prod']
+                    ]) {
                         sh '''
-                          terraform apply tfplan
+                          export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
+                          terraform apply -auto-approve tfplan
                         '''
                     }
                 }
@@ -67,10 +79,10 @@ pipeline {
 
     post {
         success {
-            echo "Terraform pipeline completed successfully"
+            echo "✅ Terraform pipeline completed successfully"
         }
         failure {
-            echo "Terraform pipeline failed"
+            echo "❌ Terraform pipeline failed"
         }
     }
 }
