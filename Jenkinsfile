@@ -49,7 +49,8 @@ pipeline {
                     ]) {
                         sh '''
                           export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
-                          terraform plan -var-file=${TFVARS_FILE} -out=tfplan
+                          terraform plan \
+                            -var-file=${TFVARS_FILE}
                         '''
                     }
                 }
@@ -57,11 +58,7 @@ pipeline {
         }
 
         stage('Terraform Apply') {
-            when {
-                branch "main"
-            }
             steps {
-                input message: "Approve Terraform Apply to PROD?"
                 dir('shopnow-infra') {
                     withCredentials([
                         [$class: 'AmazonWebServicesCredentialsBinding',
@@ -69,7 +66,9 @@ pipeline {
                     ]) {
                         sh '''
                           export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
-                          terraform apply -auto-approve tfplan
+                          terraform apply \
+                            -var-file=${TFVARS_FILE} \
+                            -auto-approve
                         '''
                     }
                 }
@@ -79,7 +78,7 @@ pipeline {
 
     post {
         success {
-            echo "✅ Terraform pipeline completed successfully"
+            echo "✅ Terraform APPLY completed successfully"
         }
         failure {
             echo "❌ Terraform pipeline failed"
