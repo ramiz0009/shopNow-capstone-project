@@ -15,8 +15,8 @@ vpc_name = "sam-shopnow-vpc"
 vpc_cidr = "10.0.0.0/16"
 
 azs = [
-  "eu-west-2a",
-  "eu-west-2b"
+  "eu-west-3a",
+  "eu-west-3b"
 ]
 
 private_subnets = [
