@@ -1,5 +1,5 @@
 # Environment
-region = "eu-west-2"
+region = "eu-west-3"
 
 eks_cluster_name    = "sam-eks-cluster"
 eks_cluster_version = "1.33"
