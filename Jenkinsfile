@@ -8,7 +8,7 @@ pipeline {
 
     parameters {
         booleanParam(
-            name: 'DESTROY',
+            name: 'DESTROY_INFRA',
             defaultValue: true,
             description: 'Set to true to destroy infrastructure'
         )
@@ -51,7 +51,7 @@ pipeline {
 
         stage('Terraform Apply') {
             when {
-                expression { !params.DESTROY }
+                expression { !params.DESTROY_INFRA }
             }
             steps {
                 dir('shopnow-infra') {
@@ -62,7 +62,7 @@ pipeline {
 
         stage('Terraform Destroy') {
             when {
-                expression { params.DESTROY }
+                expression { params.DESTROY_INFRA }
             }
             steps {
                 dir('shopnow-infra') {
@@ -75,7 +75,7 @@ pipeline {
     post {
         success {
             script {
-                if (params.DESTROY) {
+                if (params.DESTROY_INFRA) {
                     echo "✅ Terraform DESTROY completed successfully"
                 } else {
                     echo "✅ Terraform APPLY completed successfully"
@@ -85,7 +85,7 @@ pipeline {
 
         failure {
             script {
-                if (params.DESTROY) {
+                if (params.DESTROY_INFRA) {
                     echo "❌ Terraform DESTROY failed — check logs"
                 } else {
                     echo "❌ Terraform APPLY failed — check logs"
