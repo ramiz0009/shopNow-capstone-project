@@ -71,4 +71,30 @@ pipeline {
             }
         }
     }
+
+    post {
+        success {
+            script {
+                if (params.DESTROY) {
+                    echo "✅ Terraform DESTROY completed successfully"
+                } else {
+                    echo "✅ Terraform APPLY completed successfully"
+                }
+            }
+        }
+
+        failure {
+            script {
+                if (params.DESTROY) {
+                    echo "❌ Terraform DESTROY failed — check logs"
+                } else {
+                    echo "❌ Terraform APPLY failed — check logs"
+                }
+            }
+        }
+
+        always {
+            echo "ℹ️ Terraform pipeline finished (success or failure)"
+        }
+    }
 }
